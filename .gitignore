@@ -1,0 +1,64 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+# Excluir apenas se você não quiser versionar pacotes restaurados
+*.nuget.props
+*.nuget.targets
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# DotCover
+*.dotCover
+
+# TFS
+$tf/
+
+# Backup & temp files
+*.bak
+*.tmp
+*.temp
+*.swp
+
+# Publish outputs
+publish/
+wwwroot/
+
+# Configurações locais
+appsettings.Development.json
+appsettings.Local.json
+
+# Rider
+.idea/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Others
+*.dbmdl
+*.jfm
