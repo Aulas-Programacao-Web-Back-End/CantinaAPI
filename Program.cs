@@ -10,6 +10,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
