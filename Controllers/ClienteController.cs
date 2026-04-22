@@ -102,5 +102,48 @@ namespace CantinaAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("{id}/relatorio")]
+        public async Task<ActionResult<ClienteRelatorioDTO>> GerarRelatorio(int id)
+        {
+            var cliente = await _context.Clientes
+                .Include(c => c.Pedidos)
+                    .ThenInclude(p => p.Produto)
+                .FirstOrDefaultAsync(c => c.IdCliente == id);
+
+            if (cliente == null) return NotFound();
+
+            // Produto mais pedido — soma quantidade por produto e pega o maior
+            var produtoMaisPedido = cliente.Pedidos
+                .GroupBy(p => p.Produto.Descricao)
+                .OrderByDescending(g => g.Sum(p => p.Quantidade))
+                .Select(g => g.Key)
+                .FirstOrDefault() ?? "Nenhum pedido";
+
+            var relatorio = new ClienteRelatorioDTO
+            {
+                IdCliente = cliente.IdCliente,
+                Nome = cliente.Nome,
+                Turma = cliente.Turma,
+                Telefone = cliente.Telefone,
+
+                TotalPedidos = cliente.Pedidos.Count,
+                TotalGasto = (decimal)cliente.Pedidos.Sum(p => p.ValorTotal),
+                ProdutoMaisPedido = produtoMaisPedido,
+
+                Pedidos = cliente.Pedidos
+                    .OrderByDescending(p => p.DataPedido)
+                    .Select(p => new PedidoResumoDTO
+                    {
+                        IdPedido = p.IdPedido,
+                        Produto = p.Produto.Descricao,
+                        Quantidade = p.Quantidade,
+                        ValorTotal = (decimal)p.ValorTotal,
+                        DataPedido = p.DataPedido
+                    }).ToList()
+            };
+
+            return Ok(relatorio);
+        }
     }
 }
