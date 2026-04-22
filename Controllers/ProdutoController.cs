@@ -25,7 +25,7 @@ namespace CantinaAPI.Controllers
                 {
                     IdProduto = p.IdProduto,
                     Descricao = p.Descricao,
-                    Preco = p.Preco,
+                    Preco = (decimal)p.Preco,
                     Categoria = p.Categoria
                 })
                 .ToListAsync();
@@ -42,7 +42,7 @@ namespace CantinaAPI.Controllers
                 {
                     IdProduto = p.IdProduto,
                     Descricao = p.Descricao,
-                    Preco = p.Preco,
+                    Preco = (decimal)p.Preco,
                     Categoria = p.Categoria
                 })
                 .FirstOrDefaultAsync();
@@ -58,8 +58,8 @@ namespace CantinaAPI.Controllers
             var produto = new Produto
             {
                 Descricao = dto.Descricao,
-                Preco = dto.Preco,
-                Categoria = dto.Categoria
+                Preco = (double)dto.Preco,
+                Categoria = dto.Categoria.ToString()
             };
 
             _context.Produtos.Add(produto);
@@ -69,7 +69,7 @@ namespace CantinaAPI.Controllers
             {
                 IdProduto = produto.IdProduto,
                 Descricao = produto.Descricao,
-                Preco = produto.Preco,
+                Preco = (decimal)produto.Preco,
                 Categoria = produto.Categoria
             };
 
@@ -83,8 +83,8 @@ namespace CantinaAPI.Controllers
             if (produto == null) return NotFound();
 
             produto.Descricao = dto.Descricao;
-            produto.Preco = dto.Preco;
-            produto.Categoria = dto.Categoria;
+            produto.Preco = (double)dto.Preco;
+            produto.Categoria = dto.Categoria.ToString();
 
             await _context.SaveChangesAsync();
 

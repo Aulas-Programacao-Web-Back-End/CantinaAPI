@@ -29,7 +29,7 @@ namespace CantinaAPI.Controllers
                     NomeCliente = p.Cliente.Nome,
                     Produto = p.Produto.Descricao,
                     Quantidade = p.Quantidade,
-                    ValorTotal = p.ValorTotal,
+                    ValorTotal = (decimal)p.ValorTotal,
                     DataPedido = p.DataPedido
                 })
                 .ToListAsync();
@@ -50,7 +50,7 @@ namespace CantinaAPI.Controllers
                     NomeCliente = p.Cliente.Nome,
                     Produto = p.Produto.Descricao,
                     Quantidade = p.Quantidade,
-                    ValorTotal = p.ValorTotal,
+                    ValorTotal = (decimal)p.ValorTotal,
                     DataPedido = p.DataPedido
                 })
                 .FirstOrDefaultAsync();
@@ -91,7 +91,7 @@ namespace CantinaAPI.Controllers
                     NomeCliente = p.Cliente.Nome,
                     Produto = p.Produto.Descricao,
                     Quantidade = p.Quantidade,
-                    ValorTotal = p.ValorTotal,
+                    ValorTotal = (decimal)p.ValorTotal,
                     DataPedido = p.DataPedido
                 })
                 .FirstAsync();
