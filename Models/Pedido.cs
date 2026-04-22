@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CantinaAPI.Models
@@ -15,7 +16,9 @@ namespace CantinaAPI.Models
         public double ValorTotal { get; set; }
 
         // Propriedades de navegação
+        [JsonIgnore]
         public Cliente Cliente { get; set; } = null!;
+        [JsonIgnore]
         public Produto Produto { get; set; } = null!;
     }
 }

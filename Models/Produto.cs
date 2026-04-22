@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CantinaAPI.Models
@@ -12,6 +13,7 @@ namespace CantinaAPI.Models
         public required double Preco { get; set; }
         public required string Categoria { get; set; }
 
+        [JsonIgnore]
         public List<Pedido> Pedidos { get; set; } = [];
     }
 }
