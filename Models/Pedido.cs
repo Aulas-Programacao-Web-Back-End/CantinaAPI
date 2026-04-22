@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -17,8 +18,10 @@ namespace CantinaAPI.Models
 
         // Propriedades de navegação
         [JsonIgnore]
+        [ForeignKey("IdCliente")]
         public Cliente Cliente { get; set; } = null!;
         [JsonIgnore]
+        [ForeignKey("IdProduto")]
         public Produto Produto { get; set; } = null!;
     }
 }
