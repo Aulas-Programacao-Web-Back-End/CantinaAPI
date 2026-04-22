@@ -21,14 +21,14 @@ namespace CantinaAPI.Context
             // 🔥 RELACIONAMENTO Pedido -> Cliente
             modelBuilder.Entity<Pedido>()
                 .HasOne(p => p.Cliente)
-                .WithMany() // um cliente pode ter vários pedidos
+                .WithMany(c => c.Pedidos)
                 .HasForeignKey(p => p.IdCliente)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // 🔥 RELACIONAMENTO Pedido -> Produto
             modelBuilder.Entity<Pedido>()
                 .HasOne(p => p.Produto)
-                .WithMany() // um produto pode estar em vários pedidos
+                .WithMany(p => p.Pedidos)
                 .HasForeignKey(p => p.IdProduto)
                 .OnDelete(DeleteBehavior.Restrict);
         }

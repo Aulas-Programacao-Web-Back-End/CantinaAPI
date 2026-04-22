@@ -3,6 +3,7 @@ using System;
 using CantinaAPI.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CantinaAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260422180728_CorrigirForeignKeys")]
+    partial class CorrigirForeignKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +57,9 @@ namespace CantinaAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdPedido"));
 
+                    b.Property<int?>("ClienteIdCliente")
+                        .HasColumnType("integer");
+
                     b.Property<DateOnly>("DataPedido")
                         .HasColumnType("date");
 
@@ -61,6 +67,9 @@ namespace CantinaAPI.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("IdProduto")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProdutoIdProduto")
                         .HasColumnType("integer");
 
                     b.Property<int>("Quantidade")
@@ -71,9 +80,13 @@ namespace CantinaAPI.Migrations
 
                     b.HasKey("IdPedido");
 
+                    b.HasIndex("ClienteIdCliente");
+
                     b.HasIndex("IdCliente");
 
                     b.HasIndex("IdProduto");
+
+                    b.HasIndex("ProdutoIdProduto");
 
                     b.ToTable("Pedidos");
                 });
@@ -104,17 +117,25 @@ namespace CantinaAPI.Migrations
 
             modelBuilder.Entity("CantinaAPI.Models.Pedido", b =>
                 {
-                    b.HasOne("CantinaAPI.Models.Cliente", "Cliente")
+                    b.HasOne("CantinaAPI.Models.Cliente", null)
                         .WithMany("Pedidos")
+                        .HasForeignKey("ClienteIdCliente");
+
+                    b.HasOne("CantinaAPI.Models.Cliente", "Cliente")
+                        .WithMany()
                         .HasForeignKey("IdCliente")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CantinaAPI.Models.Produto", "Produto")
-                        .WithMany("Pedidos")
+                        .WithMany()
                         .HasForeignKey("IdProduto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("CantinaAPI.Models.Produto", null)
+                        .WithMany("Pedidos")
+                        .HasForeignKey("ProdutoIdProduto");
 
                     b.Navigation("Cliente");
 
