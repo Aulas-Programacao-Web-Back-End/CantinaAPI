@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using CantinaAPI.Models;
 using CantinaAPI.Context;
+using CantinaAPI.DTOs;
 
 namespace CantinaAPI.Controllers
 {
@@ -17,42 +18,75 @@ namespace CantinaAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produto>>> ListarProdutos()
+        public async Task<ActionResult<IEnumerable<ProdutoResponseDTO>>> ListarProdutos()
         {
-            return Ok(await _context.Produtos.ToListAsync());
+            var produtos = await _context.Produtos
+                .Select(p => new ProdutoResponseDTO
+                {
+                    IdProduto = p.IdProduto,
+                    Descricao = p.Descricao,
+                    Preco = p.Preco,
+                    Categoria = p.Categoria
+                })
+                .ToListAsync();
+
+            return Ok(produtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Produto>> ListarProduto(int id)
+        public async Task<ActionResult<ProdutoResponseDTO>> ListarProduto(int id)
         {
-            var produto = await _context.Produtos.FindAsync(id);
-            if(produto == null) return NotFound();
+            var produto = await _context.Produtos
+                .Where(p => p.IdProduto == id)
+                .Select(p => new ProdutoResponseDTO
+                {
+                    IdProduto = p.IdProduto,
+                    Descricao = p.Descricao,
+                    Preco = p.Preco,
+                    Categoria = p.Categoria
+                })
+                .FirstOrDefaultAsync();
+
+            if (produto == null) return NotFound();
+
             return Ok(produto);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Produto>> CadastrarProduto(Produto produto)
+        public async Task<ActionResult<ProdutoResponseDTO>> CadastrarProduto(ProdutoCreateDTO dto)
         {
+            var produto = new Produto
+            {
+                Descricao = dto.Descricao,
+                Preco = dto.Preco,
+                Categoria = dto.Categoria
+            };
+
             _context.Produtos.Add(produto);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(ListarProduto), new { id = produto.IdProduto }, produto);
+
+            var response = new ProdutoResponseDTO
+            {
+                IdProduto = produto.IdProduto,
+                Descricao = produto.Descricao,
+                Preco = produto.Preco,
+                Categoria = produto.Categoria
+            };
+
+            return CreatedAtAction(nameof(ListarProduto), new { id = response.IdProduto }, response);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarProduto(int id, Produto produto)
+        public async Task<IActionResult> AtualizarProduto(int id, ProdutoCreateDTO dto)
         {
-            if(id != produto.IdProduto) return BadRequest();
-            
-            _context.Entry(produto).State = EntityState.Modified;
+            var produto = await _context.Produtos.FindAsync(id);
+            if (produto == null) return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if(! _context.Produtos.Any(p => p.IdProduto == id)) return NotFound();
-            }
+            produto.Descricao = dto.Descricao;
+            produto.Preco = dto.Preco;
+            produto.Categoria = dto.Categoria;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -62,9 +96,10 @@ namespace CantinaAPI.Controllers
         {
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null) return NotFound();
-            
+
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }

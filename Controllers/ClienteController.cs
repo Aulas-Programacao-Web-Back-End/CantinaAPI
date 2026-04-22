@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using CantinaAPI.Context;
 using CantinaAPI.Models;
+using CantinaAPI.DTOs;
 
 namespace CantinaAPI.Controllers
 {
@@ -17,43 +18,75 @@ namespace CantinaAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> ListarClientes()
+        public async Task<ActionResult<IEnumerable<ClienteResponseDTO>>> ListarClientes()
         {
-            return Ok(await _context.Clientes.ToListAsync());
+            var clientes = await _context.Clientes
+                .Select(c => new ClienteResponseDTO
+                {
+                    IdCliente = c.IdCliente,
+                    Nome = c.Nome,
+                    Turma = c.Turma,
+                    Telefone = c.Telefone
+                })
+                .ToListAsync();
+
+            return Ok(clientes);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> ListarCliente(int id)
+        public async Task<ActionResult<ClienteResponseDTO>> ListarCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _context.Clientes
+                .Where(c => c.IdCliente == id)
+                .Select(c => new ClienteResponseDTO
+                {
+                    IdCliente = c.IdCliente,
+                    Nome = c.Nome,
+                    Turma = c.Turma,
+                    Telefone = c.Telefone
+                })
+                .FirstOrDefaultAsync();
+
             if (cliente == null) return NotFound();
+
             return Ok(cliente);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Cliente>> CadastrarCliente(Cliente cliente)
+        public async Task<ActionResult<ClienteResponseDTO>> CadastrarCliente(ClienteCreateDTO dto)
         {
+            var cliente = new Cliente
+            {
+                Nome = dto.Nome,
+                Turma = dto.Turma,
+                Telefone = dto.Telefone
+            };
+
             _context.Clientes.Add(cliente);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(ListarCliente), new { id = cliente.IdCliente }, cliente);
+
+            var response = new ClienteResponseDTO
+            {
+                IdCliente = cliente.IdCliente,
+                Nome = cliente.Nome,
+                Turma = cliente.Turma,
+                Telefone = cliente.Telefone
+            };
+
+            return CreatedAtAction(nameof(ListarCliente), new { id = response.IdCliente }, response);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarCliente(int id, Cliente cliente)
+        public async Task<IActionResult> AtualizarCliente(int id, ClienteCreateDTO dto)
         {
-            if (id != cliente.IdCliente) return BadRequest();
+            var cliente = await _context.Clientes.FindAsync(id);
+            if (cliente == null) return NotFound();
 
-            _context.Entry(cliente).State = EntityState.Modified;
+            cliente.Nome = dto.Nome;
+            cliente.Turma = dto.Turma;
+            cliente.Telefone = dto.Telefone;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Clientes.Any(c => c.IdCliente == id)) return NotFound();
-                throw;
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -66,6 +99,7 @@ namespace CantinaAPI.Controllers
 
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }
